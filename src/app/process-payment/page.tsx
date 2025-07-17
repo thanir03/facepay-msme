@@ -275,6 +275,7 @@ export default function ProcessPayment() {
         </div>
       </nav>
       <div className="flex flex-col items-center justify-center flex-1 min-h-[70vh] w-full">
+        <h1 className="text-3xl font-bold mb-8">FacePay Consumer Login</h1>
         <FaceScan showInstructions={false} onConfirm={handleConfirm} />
       </div>
       <ConfirmDialog

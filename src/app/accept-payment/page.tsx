@@ -127,7 +127,7 @@ export default function AcceptPayment() {
             className="min-w-[220px] bg-white border-2 border-black shadow-lg rounded-xl text-black"
           >
             <DropdownMenuLabel className="font-bold text-black">
-              Mr Thanirmalai
+              Mr. Thanirmalai
             </DropdownMenuLabel>
             <div className="px-4 py-1 text-xs text-gray-500">
               thanir@1utar.my

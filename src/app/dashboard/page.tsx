@@ -125,7 +125,7 @@ export default function Dashboard() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-black bg-white hover:bg-[#F9BC01]/90 shadow font-semibold text-black hover:text-black focus:outline-none transition-colors">
-              <span className="font-bold">Mr Thanirmalai</span>
+              <span className="font-bold">Mr. Thanirmalai</span>
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                 <path
                   stroke="currentColor"
