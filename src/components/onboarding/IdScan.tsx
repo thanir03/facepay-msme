@@ -11,6 +11,7 @@ export default function IDScan({
   const idRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const idImageRef = useRef<HTMLImageElement>(null);
+  const [error, setError] = useState<string | null>(null);
   const [showImage, setShowImage] = useState(idImage !== null);
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function IDScan({
         }
       })
       .catch((e) => {
+        setError(e.message);
         console.log("error getting media stream", e);
         console.log(e);
       });
@@ -65,14 +67,17 @@ export default function IDScan({
           )}
           <img
             ref={idImageRef}
-            src={idImage ?? ""}
+            src={
+              idImage ??
+              "https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png"
+            }
             alt="id"
             className={
               "w-full h-full object-cover " + (showImage ? "" : "hidden")
             }
           />
 
-          {!showImage && (
+          {!showImage && !error && (
             <div className="flex items-center justify-center flex-col z-10">
               <span className="text-black text-2xl font-bold mb-8 drop-shadow-lg">
                 Align your ID card in the rectangle
@@ -83,6 +88,13 @@ export default function IDScan({
               >
                 Capture ID Card
               </Button>
+            </div>
+          )}
+          {error && (
+            <div className="flex items-center justify-center flex-col z-10">
+              <span className="text-red-500 text-2xl font-bold mb-8 drop-shadow-lg">
+                {error}
+              </span>
             </div>
           )}
           {showImage && (

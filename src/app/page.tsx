@@ -55,11 +55,21 @@ export default function Home() {
           Just with your face.
         </motion.p>
       </motion.div>
+      {/* MSME Login Button - fixed bottom left */}
+      <div className="fixed bottom-8 left-8">
+        <Button
+          size="lg"
+          className="px-8 py-4 bg-black text-white text-xl font-bold rounded-full shadow-lg border-2 border-black transition-all z-50 hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl hover:border-yellow-400 duration-200 cursor-pointer"
+          onClick={() => router.push("/login")}
+        >
+          MSME Login
+        </Button>
+      </div>
       {/* Continue Button - fixed bottom right */}
       <div className="fixed bottom-8 right-8">
         <Button
           size="lg"
-          className="text-lg rounded-full shadow-lg bg-black   hover:bg-black text-white px-8 py-4"
+          className="px-8 py-4 bg-black text-white text-xl font-bold rounded-full shadow-lg border-2 border-black transition-all z-50 hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl hover:border-yellow-400 duration-200 cursor-pointer"
           onClick={() => router.push("/onboarding")}
         >
           Get Started <span className="ml-2">→</span>

@@ -110,8 +110,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F9BC01] pb-28 relative">
       {/* Navbar */}
-      <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#F9BC01]/90 text-black shadow-md mb-8">
-        <div className="flex items-center gap-3">
+      <nav className="w-full flex items-center justify-between px-8 py-4 bg-[#F9BC01]/90 text-black shadow-md mb-8 cursor-pointer">
+        <div
+          className="flex items-center gap-3"
+          onClick={() => router.push("/")}
+        >
           <img
             src="/facepay_logo.jpeg"
             alt="FacePay Logo"
@@ -160,7 +163,7 @@ export default function Dashboard() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="bg-white/90 rounded-xl border-2 border-black shadow flex flex-col items-center justify-center p-6 gap-2"
+              className="bg-white rounded-xl border-2 border-black shadow flex flex-col items-center justify-center p-6 gap-2"
             >
               <div className="text-3xl mb-1">{stat.icon}</div>
               <div className="text-lg text-gray-600 font-medium">
@@ -169,7 +172,7 @@ export default function Dashboard() {
               <div className="text-2xl font-bold text-black">{stat.value}</div>
             </div>
           ))}
-          <div className="bg-white/90 rounded-xl border-2 border-black shadow flex flex-col items-center justify-center p-6 gap-2">
+          <div className="bg-white rounded-xl border-2 border-black shadow flex flex-col items-center justify-center p-6 gap-2">
             <div className="text-lg text-gray-600 font-medium mb-2">
               Transactions by Month
             </div>
@@ -181,8 +184,8 @@ export default function Dashboard() {
         </div>
       </div>
       <button
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 px-8 py-4 bg-black text-white text-xl font-bold rounded-full shadow-lg border-2 border-black hover:bg-[#CA830A] hover:text-black transition-all z-50"
-        onClick={() => alert("Accepting new payment...")}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 px-8 py-4 bg-black text-white text-xl font-bold rounded-full shadow-lg border-2 border-black transition-all z-50 hover:bg-white hover:text-black hover:scale-105 hover:shadow-2xl hover:border-yellow-400 duration-200"
+        onClick={() => router.push("/accept-payment")}
       >
         Accept New Payment
       </button>

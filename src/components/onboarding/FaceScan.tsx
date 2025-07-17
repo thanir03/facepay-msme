@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import * as faceLandmarksDetection from "@tensorflow-models/face-landmarks-detection";
 import { drawMesh } from "../../../utilities";
+import { loadFaceLandmarksDetection } from "../../../util";
 
 export default function FaceScan({
   onConfirm,
+  showInstructions = true,
 }: {
   onConfirm: (image: string) => void;
+  showInstructions?: boolean;
 }) {
   const faceRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,13 +19,7 @@ export default function FaceScan({
 
   useEffect(() => {
     const loadModel = async () => {
-      const tf = await import("@tensorflow/tfjs");
-      await tf.setBackend("webgl");
-      await tf.ready();
-      const faceLandmarksDetection = await import(
-        "@tensorflow-models/face-landmarks-detection"
-      );
-
+      const faceLandmarksDetection = await loadFaceLandmarksDetection();
       const detector = await faceLandmarksDetection.load(
         faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
         {
@@ -36,15 +32,13 @@ export default function FaceScan({
       intervalRef.current = setInterval(() => {
         detect(detector);
         setScanning((scanning) => {
-          console.log("detecting", scanning);
-
           if (scanning >= 100) {
             clearInterval(intervalRef.current!);
             return 100;
           }
           return scanning + 1;
         });
-      }, 50);
+      }, 10);
     };
     loadModel();
 
@@ -72,7 +66,8 @@ export default function FaceScan({
   }, [scanning]);
 
   const captureImage = () => {
-    if (!faceRef.current || !hiddenCanvasRef.current) return;
+    if (!faceRef.current || !hiddenCanvasRef.current || !canvasRef.current)
+      return;
     const video = faceRef.current;
     const canvas = canvasRef.current;
     canvas!.width = video.video!.videoWidth;
@@ -89,13 +84,14 @@ export default function FaceScan({
     }
   };
 
-  const detect = async (net: faceLandmarksDetection.FaceLandmarksDetector) => {
+  const detect = async (net: any) => {
     if (
       faceRef.current &&
       faceRef.current.video &&
       faceRef.current.video.readyState === 4 &&
       canvasRef.current
     ) {
+      console.log("Running detect", canvasRef.current);
       // Get Video Properties
       const video = faceRef.current.video;
       const videoWidth = video.videoWidth;
@@ -106,17 +102,20 @@ export default function FaceScan({
       canvasRef.current.height = videoHeight;
 
       const face = await net.estimateFaces({ input: video });
-      // Get canvas context
-      const ctx = canvasRef.current.getContext("2d")!;
-      requestAnimationFrame(() => {
-        ctx.clearRect(
-          0,
-          0,
-          canvasRef.current!.width,
-          canvasRef.current!.height
-        );
-        drawMesh(face, ctx);
-      });
+
+      if (canvasRef.current) {
+        // Get canvas context
+        const ctx = canvasRef.current.getContext("2d")!;
+        requestAnimationFrame(() => {
+          ctx.clearRect(
+            0,
+            0,
+            canvasRef.current!.width,
+            canvasRef.current!.height
+          );
+          drawMesh(face, ctx);
+        });
+      }
     }
   };
 
@@ -194,42 +193,44 @@ export default function FaceScan({
           </div>
         </div>
         {/* Instructions and steps */}
-        <div className="flex flex-col items-center justify-center z-10 bg-white/80 rounded-2xl p-8 shadow-xl border border-gray-200 pb-0">
-          <div className="mb-6 flex flex-col gap-2 items-center">
-            <span className="text-black text-2xl font-extrabold drop-shadow-sm tracking-tight">
-              Face Scan Instructions
-            </span>
-            <span className="text-gray-600 text-base font-medium">
-              Please follow these steps for best results:
-            </span>
+        {showInstructions && (
+          <div className="flex flex-col items-center justify-center z-10 bg-white/80 rounded-2xl p-8 shadow-xl border border-gray-200 pb-0">
+            <div className="mb-6 flex flex-col gap-2 items-center">
+              <span className="text-black text-2xl font-extrabold drop-shadow-sm tracking-tight">
+                Face Scan Instructions
+              </span>
+              <span className="text-gray-600 text-base font-medium">
+                Please follow these steps for best results:
+              </span>
+            </div>
+            <ul className="mb-8 space-y-3 w-full max-w-xs">
+              <li className="flex items-center gap-3">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black font-bold shadow">
+                  1
+                </span>
+                <span className="text-black text-lg font-semibold">
+                  Look directly at the camera
+                </span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black font-bold shadow">
+                  2
+                </span>
+                <span className="text-black text-lg font-semibold">
+                  Ensure good lighting
+                </span>
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black font-bold shadow">
+                  3
+                </span>
+                <span className="text-black text-lg font-semibold">
+                  Keep your face within the frame
+                </span>
+              </li>
+            </ul>
           </div>
-          <ul className="mb-8 space-y-3 w-full max-w-xs">
-            <li className="flex items-center gap-3">
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black font-bold shadow">
-                1
-              </span>
-              <span className="text-black text-lg font-semibold">
-                Look directly at the camera
-              </span>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black font-bold shadow">
-                2
-              </span>
-              <span className="text-black text-lg font-semibold">
-                Ensure good lighting
-              </span>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-400 text-black font-bold shadow">
-                3
-              </span>
-              <span className="text-black text-lg font-semibold">
-                Keep your face within the frame
-              </span>
-            </li>
-          </ul>
-        </div>
+        )}
       </div>
     </div>
   );

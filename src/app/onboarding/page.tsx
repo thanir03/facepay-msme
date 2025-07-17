@@ -191,7 +191,7 @@ export default function Onboarding() {
                       <img
                         src={type.image}
                         alt={type.name}
-                        className="w-8 h-8 object-contain mr-2"
+                        className="w-12 h-12 object-contain mr-2"
                       />
                       {type.name}
                     </button>
