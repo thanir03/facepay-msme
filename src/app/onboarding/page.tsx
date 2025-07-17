@@ -17,12 +17,31 @@ const steps = [
 ];
 
 const businessTypes = [
-  "Retail",
-  "Restaurant",
-  "Salon",
-  "Grocery",
-  "Pharmacy",
-  "Other",
+  {
+    name: "Retail",
+    image: "https://cdn-icons-png.flaticon.com/512/9725/9725546.png",
+  },
+  {
+    name: "Restaurant",
+    image: "https://cdn-icons-png.flaticon.com/512/7845/7845744.png",
+  },
+  {
+    name: "Salon",
+    image: "https://cdn-icons-png.flaticon.com/512/3791/3791216.png",
+  },
+  {
+    name: "Grocery",
+    image: "https://cdn-icons-png.flaticon.com/512/1261/1261163.png",
+  },
+  {
+    name: "Pharmacy",
+    image: "https://cdn-icons-png.flaticon.com/512/11469/11469451.png",
+  },
+  {
+    name: "Other",
+    image:
+      "https://png.pngtree.com/png-clipart/20190705/original/pngtree-list-vector-icon-png-image_4236974.jpg",
+  },
 ];
 
 export default function Onboarding() {
@@ -38,6 +57,23 @@ export default function Onboarding() {
   const [email, setEmail] = useState("");
   const [kit, setKit] = useState("");
   const [errors, setErrors] = useState<any>({});
+
+  const businessNameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log("step", step, phoneRef.current);
+      if (step === 2 && businessNameRef.current)
+        businessNameRef.current.focus();
+      if (step === 4 && phoneRef.current) {
+        console.log("focusing on phone");
+        phoneRef.current.focus();
+      }
+      if (step === 5 && emailRef.current) emailRef.current.focus();
+    }, 150);
+  }, [step]);
 
   function handleNext() {
     setStep((s) => s + 1);
@@ -106,12 +142,13 @@ export default function Onboarding() {
             {step === 2 && (
               <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center">
                 <div className="w-full text-left mb-2">
-                  <span className="text-xl font-bold text-black">
+                  <span className="text-2xl font-bold text-black">
                     What is your business name?
                   </span>
                 </div>
                 <input
-                  className="w-full border-0 border-b-2 border-black bg-[#F9BC01] text-black text-2xl font-bold px-0 py-3 focus:outline-none focus:border-b-4 focus:border-black placeholder:text-gray-700 placeholder:font-normal rounded-none transition-all duration-200"
+                  ref={businessNameRef}
+                  className="w-full border-0 border-b-2 border-black bg-[#F9BC01] text-black text-3xl font-bold px-0 py-4 focus:outline-none focus:border-b-4 focus:border-black placeholder:text-gray-700 placeholder:font-normal rounded-none transition-all duration-200"
                   placeholder="Enter Business Name"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
@@ -131,27 +168,32 @@ export default function Onboarding() {
             {step === 3 && (
               <div className="w-full max-w-md mx-auto flex flex-col gap-4 items-center justify-center">
                 <div className="w-full text-left mb-2">
-                  <span className="text-xl font-bold text-black">
+                  <span className="text-2xl font-bold text-black">
                     What type of business do you have?
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 w-full">
                   {businessTypes.map((type) => (
                     <button
-                      key={type}
-                      className={`px-4 py-3 rounded-lg border-2 border-black font-semibold text-lg transition-all duration-150 ${
-                        businessType === type
+                      key={type.name}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-black font-semibold text-lg transition-all duration-150 ${
+                        businessType === type.name
                           ? "bg-black text-white"
                           : "bg-white text-black hover:bg-black hover:text-white"
                       }`}
                       onClick={() => {
-                        setBusinessType(type);
+                        setBusinessType(type.name);
                         setTimeout(() => {
                           setStep((s) => s + 1);
                         }, 100);
                       }}
                     >
-                      {type}
+                      <img
+                        src={type.image}
+                        alt={type.name}
+                        className="w-8 h-8 object-contain mr-2"
+                      />
+                      {type.name}
                     </button>
                   ))}
                 </div>
@@ -166,12 +208,13 @@ export default function Onboarding() {
             {step === 4 && (
               <div className="w-full max-w-md mx-auto flex flex-col gap-4 items-center justify-center">
                 <div className="w-full text-left mb-2">
-                  <span className="text-xl font-bold text-black">
+                  <span className="text-2xl font-bold text-black">
                     What is your phone number?
                   </span>
                 </div>
                 <input
-                  className="w-full border-0 border-b-2 border-black bg-[#F9BC01] text-black text-2xl font-bold px-0 py-3 focus:outline-none focus:border-b-4 focus:border-black placeholder:text-gray-700 placeholder:font-normal rounded-none transition-all duration-200"
+                  ref={phoneRef}
+                  className="w-full border-0 border-b-2 border-black bg-[#F9BC01] text-black text-3xl font-bold px-0 py-4 focus:outline-none focus:border-b-4 focus:border-black placeholder:text-gray-700 placeholder:font-normal rounded-none transition-all duration-200"
                   placeholder="Enter Phone Number"
                   value={phone}
                   onChange={(e) =>
@@ -192,12 +235,13 @@ export default function Onboarding() {
             {step === 5 && (
               <div className="w-full max-w-md mx-auto flex flex-col gap-4 items-center justify-center">
                 <div className="w-full text-left mb-2">
-                  <span className="text-xl font-bold text-black">
+                  <span className="text-2xl font-bold text-black">
                     What is your email address?
                   </span>
                 </div>
                 <input
-                  className="w-full border-0 border-b-2 border-black bg-[#F9BC01] text-black text-2xl font-bold px-0 py-3 focus:outline-none focus:border-b-4 focus:border-black placeholder:text-gray-700 placeholder:font-normal rounded-none transition-all duration-200"
+                  ref={emailRef}
+                  className="w-full border-0 border-b-2 border-black bg-[#F9BC01] text-black text-3xl font-bold px-0 py-4 focus:outline-none focus:border-b-4 focus:border-black placeholder:text-gray-700 placeholder:font-normal rounded-none transition-all duration-200"
                   placeholder="Enter Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -269,33 +313,64 @@ export default function Onboarding() {
             )}
             {/* Navigation Buttons */}
             <div className="flex w-full justify-between gap-4 mt-8 px-8 absolute bottom-8 left-0 z-20">
-              <Button
-                onClick={handlePrev}
-                disabled={step === 0}
-                variant="outline"
-                className="flex items-center gap-2 border-gray-400 text-gray-700 bg-gray-100"
-                style={{
-                  borderColor: "#9ca3af",
-                  color: "#374151",
-                  backgroundColor: step === 0 ? "#f3f4f6" : undefined,
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              {step >= 1 && (
+                <Button
+                  onClick={handlePrev}
+                  disabled={step === 0}
+                  variant="outline"
+                  className="flex items-center gap-2 border-gray-400 text-gray-700 bg-gray-100"
+                  style={{
+                    borderColor: "#9ca3af",
+                    color: "#374151",
+                    backgroundColor: step === 0 ? "#f3f4f6" : undefined,
+                  }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-                Previous
-              </Button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  Previous
+                </Button>
+              )}
+
+              {step == 0 && (
+                <Button
+                  onClick={() => router.push("/")}
+                  variant="outline"
+                  className="flex items-center gap-2 border-gray-400 text-gray-700 bg-gray-100 cursor-pointer"
+                  style={{
+                    borderColor: "#9ca3af",
+                    color: "#374151",
+                    backgroundColor: step === 0 ? "#f3f4f6" : undefined,
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  Back to Home
+                </Button>
+              )}
               {step >= 2 && step < 6 && (
                 <Button className="text-xl p-2" onClick={handleNext}>
                   Next

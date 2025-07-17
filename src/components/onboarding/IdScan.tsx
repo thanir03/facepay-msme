@@ -86,7 +86,7 @@ export default function IDScan({
             </div>
           )}
           {showImage && (
-            <div className="flex flex-col items-center justify-center z-10 mt-4">
+            <div className="flex flex-col items-center justify-center z-10 mt-0">
               <span className="text-black text-lg font-semibold mb-4">
                 Is this image clear and readable?
               </span>

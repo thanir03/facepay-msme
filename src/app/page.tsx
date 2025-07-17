@@ -1,12 +1,28 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { MdFullscreen } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const [isFullscreen, setIsFullscreen] = useState(false);
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9BC01] px-6 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9BC01] px-6 relative cursor-pointer">
+      {!isFullscreen && (
+        <MdFullscreen
+          className="absolute top-4 right-4 text-2xl text-black z-50"
+          onClick={() => {
+            if (isFullscreen) {
+              document.exitFullscreen();
+            } else {
+              document.documentElement.requestFullscreen();
+            }
+            setIsFullscreen(!isFullscreen);
+          }}
+        />
+      )}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
