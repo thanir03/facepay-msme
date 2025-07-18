@@ -189,6 +189,6 @@ export default function AcceptPayment() {
         title="Missing Amount"
         description="Please enter an amount before scanning your face."
       />
-    </div>
+  </div>
   );
 }

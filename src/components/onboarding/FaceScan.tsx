@@ -2,7 +2,10 @@
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { drawMesh, drawMediaPipeLandmarks } from "../../../utilities";
-import { loadFaceLandmarksDetection, loadMediaPipeFaceLandmarker } from "../../../util";
+import {
+  loadFaceLandmarksDetection,
+  loadMediaPipeFaceLandmarker,
+} from "../../../util";
 import { FaceLandmarker } from "@mediapipe/tasks-vision";
 
 export default function FaceScan({
@@ -39,8 +42,11 @@ export default function FaceScan({
           });
         }, 10);
       } catch (error) {
-        console.error("Failed to load MediaPipe model, falling back to TensorFlow:", error);
-        
+        console.error(
+          "Failed to load MediaPipe model, falling back to TensorFlow:",
+          error
+        );
+
         // Fallback to TensorFlow implementation
         const faceLandmarksDetection = await loadFaceLandmarksDetection();
         const detector = await faceLandmarksDetection.load(
@@ -48,7 +54,8 @@ export default function FaceScan({
           {
             runtime: "mediapipe",
             refineLandmarks: true,
-            solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.min.js",
+            solutionPath:
+              "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.min.js",
           }
         );
 
@@ -102,7 +109,6 @@ export default function FaceScan({
       ctx.drawImage(video.video!, 0, 0, canvas!.width, canvas!.height);
       const dataUrl = canvas!.toDataURL("image/png");
       onConfirm(dataUrl);
-      console.log("captured", dataUrl);
     } else {
       console.log("ctx is null");
     }
@@ -156,7 +162,7 @@ export default function FaceScan({
     const video = faceRef.current.video;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    
+
     if (!ctx) return;
 
     // Only process if video time has changed (new frame)
@@ -171,12 +177,15 @@ export default function FaceScan({
 
     try {
       // Detect face landmarks using MediaPipe
-      const result = faceLandmarkerRef.current.detectForVideo(video, performance.now());
-      
+      const result = faceLandmarkerRef.current.detectForVideo(
+        video,
+        performance.now()
+      );
+
       // Clear canvas and draw landmarks
       requestAnimationFrame(() => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         if (result.faceLandmarks && result.faceLandmarks.length > 0) {
           drawMediaPipeLandmarks(
             result.faceLandmarks,
