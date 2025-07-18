@@ -36,9 +36,9 @@ function ConfirmDialog({
 
   const processPayment = async () => {
     setPaymentStatus("processing");
-    await timeoutPromise(2000);
+    await timeoutPromise(1000);
     setPaymentStatus("success");
-    await timeoutPromise(2000);
+    await timeoutPromise(1000);
     onComplete();
   };
 
