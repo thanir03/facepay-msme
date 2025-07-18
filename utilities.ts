@@ -218,3 +218,39 @@ export const drawMesh = (predictions: any, ctx: CanvasRenderingContext2D) => {
     });
   }
 };
+
+// MediaPipe Face Landmarks Drawing
+export const drawMediaPipeLandmarks = (
+  faceLandmarks: any[], 
+  canvasCtx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number
+) => {
+  if (faceLandmarks.length === 0) return;
+
+  faceLandmarks.forEach((landmarks) => {
+    // Convert normalized coordinates to canvas coordinates
+    const keypoints = landmarks.map((landmark: any) => [
+      landmark.x * canvasWidth,
+      landmark.y * canvasHeight,
+    ]);
+
+    // Draw triangulation mesh
+    for (let i = 0; i < TRIANGULATION.length / 3; i++) {
+      const points = [
+        TRIANGULATION[i * 3],
+        TRIANGULATION[i * 3 + 1],
+        TRIANGULATION[i * 3 + 2],
+      ].map((index) => keypoints[index]);
+      drawPath(canvasCtx, points, true);
+    }
+
+    // Draw landmark points
+    keypoints.forEach((point: number[]) => {
+      canvasCtx.beginPath();
+      canvasCtx.arc(point[0], point[1], 1, 0, 2 * Math.PI);
+      canvasCtx.fillStyle = "aqua";
+      canvasCtx.fill();
+    });
+  });
+};

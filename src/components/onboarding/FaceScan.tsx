@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { drawMesh } from "../../../utilities";
-import { loadFaceLandmarksDetection } from "../../../util";
+import { drawMesh, drawMediaPipeLandmarks } from "../../../utilities";
+import { loadFaceLandmarksDetection, loadMediaPipeFaceLandmarker } from "../../../util";
+import { FaceLandmarker } from "@mediapipe/tasks-vision";
 
 export default function FaceScan({
   onConfirm,
@@ -16,29 +17,52 @@ export default function FaceScan({
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
   const [scanning, setScanning] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const faceLandmarkerRef = useRef<FaceLandmarker | null>(null);
+  const lastVideoTimeRef = useRef(-1);
 
   useEffect(() => {
     const loadModel = async () => {
-      const faceLandmarksDetection = await loadFaceLandmarksDetection();
-      const detector = await faceLandmarksDetection.load(
-        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
-        {
-          runtime: "mediapipe",
-          refineLandmarks: true,
-          solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh",
-        }
-      );
+      try {
+        // Load MediaPipe Face Landmarker
+        const faceLandmarker = await loadMediaPipeFaceLandmarker();
+        faceLandmarkerRef.current = faceLandmarker;
 
-      intervalRef.current = setInterval(() => {
-        detect(detector);
-        setScanning((scanning) => {
-          if (scanning >= 100) {
-            clearInterval(intervalRef.current!);
-            return 100;
+        // Start detection interval
+        intervalRef.current = setInterval(() => {
+          detectMediaPipe();
+          setScanning((scanning) => {
+            if (scanning >= 100) {
+              clearInterval(intervalRef.current!);
+              return 100;
+            }
+            return scanning + 1;
+          });
+        }, 10);
+      } catch (error) {
+        console.error("Failed to load MediaPipe model, falling back to TensorFlow:", error);
+        
+        // Fallback to TensorFlow implementation
+        const faceLandmarksDetection = await loadFaceLandmarksDetection();
+        const detector = await faceLandmarksDetection.load(
+          faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+          {
+            runtime: "mediapipe",
+            refineLandmarks: true,
+            solutionPath: "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.min.js",
           }
-          return scanning + 1;
-        });
-      }, 10);
+        );
+
+        intervalRef.current = setInterval(() => {
+          detect(detector);
+          setScanning((scanning) => {
+            if (scanning >= 100) {
+              clearInterval(intervalRef.current!);
+              return 100;
+            }
+            return scanning + 1;
+          });
+        }, 10);
+      }
     };
     loadModel();
 
@@ -116,6 +140,54 @@ export default function FaceScan({
           drawMesh(face, ctx);
         });
       }
+    }
+  };
+
+  const detectMediaPipe = () => {
+    if (
+      !faceLandmarkerRef.current ||
+      !faceRef.current?.video ||
+      faceRef.current.video.readyState !== 4 ||
+      !canvasRef.current
+    ) {
+      return;
+    }
+
+    const video = faceRef.current.video;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    
+    if (!ctx) return;
+
+    // Only process if video time has changed (new frame)
+    if (video.currentTime === lastVideoTimeRef.current) {
+      return;
+    }
+    lastVideoTimeRef.current = video.currentTime;
+
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    try {
+      // Detect face landmarks using MediaPipe
+      const result = faceLandmarkerRef.current.detectForVideo(video, performance.now());
+      
+      // Clear canvas and draw landmarks
+      requestAnimationFrame(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (result.faceLandmarks && result.faceLandmarks.length > 0) {
+          drawMediaPipeLandmarks(
+            result.faceLandmarks,
+            ctx,
+            canvas.width,
+            canvas.height
+          );
+        }
+      });
+    } catch (error) {
+      console.error("MediaPipe detection error:", error);
     }
   };
 
