@@ -123,7 +123,7 @@ To accelerate adoption, we offer a **referral program**:
 2. **FacePay Mobile app**: Handle user account registration and multiple bank accounts, e-wallets and cards integration
 3. **FacePay Backend Server**: Handle all the transaction with the integration with Paynet API and face recognition based transactions
 4. **MongoDB Database** : Single source of truth for all the transactions and account details & Store Faces into embeddings format using vector store
-5. **ResNet100 Model** : To accurately detect faces
+5. **FaceNet** : Used facial recognition and generate highly discriminative face embeddings for faces
 
 ### Transaction Flow with FacePay
 
